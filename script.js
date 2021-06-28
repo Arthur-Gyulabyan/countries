@@ -3,6 +3,7 @@ const searchField = document.querySelector('#query');
 const searchForm = document.querySelector('#search-form');
 const countriesContainer = document.querySelector('.countries');
 const loadingSpinner = document.querySelector('.lds-default');
+const showAllBtn = document.querySelector('#show-all')
 
 searchForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -45,6 +46,7 @@ const renderCountry = (data) => {
                 <h3 class="country__name">${el.name}</h3>
                 <h4 class="country__region">${el.region}</h4>
                 <p class="country__row"><span>👫</span>${(Number(el.population) / 1000000).toFixed(1)} million people</p>
+                <p class="country__row"><span>🗺️</span>${(Number(el.area))} km<sup>2</sup></p>
                 <p class="country__row"><span>🗣️</span>${el.languages[0].name}</p>
                 <p class="country__row"><span>💰</span>${el.currencies[0].name}</p>
               </div>
@@ -64,6 +66,7 @@ const renderError = (message) => {
 };
 
 const requestAllCountries = () => {
+    clearContainer();
     loadingSpinner.style.display = 'inline-block';
     fetch('https://restcountries.eu/rest/v2/all')
         .then(response => response.json())
@@ -117,4 +120,4 @@ searchBtn.addEventListener('click', () => {
 });
 
 window.addEventListener('load', requestAllCountries);
-
+showAllBtn.addEventListener('click', requestAllCountries);
