@@ -5,7 +5,7 @@ const countriesContainer = document.querySelector('.countries');
 const loadingSpinner = document.querySelector('.lds-default');
 
 searchForm.addEventListener('submit', (e) => {
-   e.preventDefault();
+    e.preventDefault();
 });
 
 // class Country {
@@ -37,34 +37,37 @@ searchForm.addEventListener('submit', (e) => {
 // }
 
 const renderCountry = (data) => {
-    const html = `
-      <article class="country">
-         <img class="country__img" src="${data.flag}" alt="Flag of ${data.name}" />
-         <div class="country__data">
-           <h3 class="country__name">${data.name}</h3>
-           <h4 class="country__region">${data.region}</h4>
-           <p class="country__row"><span>👫</span>${(Number(data.population) / 1000000).toFixed(1)} million people</p>
-           <p class="country__row"><span>🗣️</span>${data.languages[0].name}</p>
-           <p class="country__row"><span>💰</span>${data.currencies[0].name}</p>
-         </div>
-       </article>
-    `;
+    data.forEach(el => {
+        const html = `
+          <article class="country">
+            <img class="country__img" src="${el.flag}" alt="Flag of ${el.name}" />
+              <div class="country__data">
+                <h3 class="country__name">${el.name}</h3>
+                <h4 class="country__region">${el.region}</h4>
+                <p class="country__row"><span>👫</span>${(Number(el.population) / 1000000).toFixed(1)} million people</p>
+                <p class="country__row"><span>🗣️</span>${el.languages[0].name}</p>
+                <p class="country__row"><span>💰</span>${el.currencies[0].name}</p>
+              </div>
+          </article>
+        `;
 
-    countriesContainer.insertAdjacentHTML('beforeend', html);
+        countriesContainer.insertAdjacentHTML('beforeend', html);
+    });
 };
 
 
 const renderError = (message) => {
-    countriesContainer.insertAdjacentText('beforeend', message);
+    const span = document.createElement('span');
+    span.textContent = message;
+    span.setAttribute('class', 'error-message');
+    countriesContainer.append(span);
 };
 
 const requestAllCountries = () => {
     loadingSpinner.style.display = 'inline-block';
     fetch('https://restcountries.eu/rest/v2/all')
         .then(response => response.json())
-        .then(data => {
-            data.forEach(el => renderCountry(el));
-        })
+        .then(data => renderCountry(data))
         .finally(() => {
             countriesContainer.style.opacity = '1';
             loadingSpinner.style.display = 'none';
@@ -83,8 +86,7 @@ const requestCountry = (countryName) => {
             }
         })
         .then(data => {
-            clearContainer();
-            renderCountry(data[0]);
+            renderCountry(data);
         })
         .finally(() => {
             countriesContainer.style.opacity = '1';
@@ -93,9 +95,11 @@ const requestCountry = (countryName) => {
 };
 
 const clearContainer = () => {
-    const elemCountries = document.querySelectorAll('.country');
+    const allChildren = Array.from(countriesContainer.children);
+    allChildren.forEach(el => el.remove());
+    // const elemCountries = document.querySelectorAll('.country');
 
-    elemCountries.forEach(el => el.remove());
+    // elemCountries.forEach(el => el.remove());
 };
 
 const getCountry = () => {
@@ -107,5 +111,10 @@ const getCountry = () => {
     }
 };
 
+searchBtn.addEventListener('click', () => {
+    clearContainer();
+    requestCountry(searchField.value);
+});
 
 window.addEventListener('load', requestAllCountries);
+
